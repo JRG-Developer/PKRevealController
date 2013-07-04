@@ -199,7 +199,6 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
         {
             [self showLeftViewControllerAnimated:animated completion:completion];
         }
-        
     }
     else if (controller == self.rightViewController)
     {
@@ -253,10 +252,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
     if (_frontViewController != frontViewController)
     {
         [self removeFrontViewControllerFromHierarchy];
-        
         _frontViewController = frontViewController;
-        _frontViewController.revealController = self;
-        
         [self addFrontViewControllerToHierarchy];
     }
 }
@@ -425,8 +421,20 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
         
         self.frontViewContainer.frame = [self frontViewFrameForCurrentState];
         [self.view addSubview:self.frontViewContainer];
-        [self.frontViewController didMoveToParentViewController:self];
         
+        self.frontViewController.revealController = self;
+        
+        if ([self.frontViewController isKindOfClass:[UINavigationController class]])
+        {
+            UINavigationController *navController = (UINavigationController *)_frontViewController;
+            for (UIViewController *viewController in navController.viewControllers)
+            {
+                viewController.revealController = self;
+            }
+        }
+        
+        [self.frontViewController didMoveToParentViewController:self];
+        self.title = self.frontViewController.title;
         [self updatePanGestureRecognizer];
     }
 }
