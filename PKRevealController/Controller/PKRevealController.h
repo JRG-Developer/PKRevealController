@@ -12,6 +12,7 @@
 
 #import <UIKit/UIKit.h>
 #import "UIViewController+PKRevealController.h"
+#import "PKRevealMenuDelegate.h"
 
 typedef NS_ENUM(NSUInteger, PKRevealControllerState)
 {
@@ -111,8 +112,8 @@ typedef void(^PKDefaultErrorHandler)(NSError *error);
 
 #pragma mark - Properties
 @property (nonatomic, strong, readonly) UIViewController *frontViewController;
-@property (nonatomic, strong, readonly) UIViewController *leftViewController;
-@property (nonatomic, strong, readonly) UIViewController *rightViewController;
+@property (nonatomic, strong, readonly) UIViewController<PKRevealMenuDelegate> *leftViewController;
+@property (nonatomic, strong, readonly) UIViewController<PKRevealMenuDelegate> *rightViewController;
 
 @property (nonatomic, strong, readonly) UIPanGestureRecognizer *revealPanGestureRecognizer;
 @property (nonatomic, strong, readonly) UITapGestureRecognizer *revealResetTapGestureRecognizer;
@@ -137,29 +138,29 @@ typedef void(^PKDefaultErrorHandler)(NSError *error);
  * Initializers. Left/right controllers can be added/exchanged/removed dynamically after initialization.
  */
 + (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
-                                    rightViewController:(UIViewController *)rightViewController
+                                     leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
+                                    rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                                                 options:(NSDictionary *)options;
 
 + (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
+                                     leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
                                                 options:(NSDictionary *)options;
 
 + (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                    rightViewController:(UIViewController *)rightViewController
+                                    rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                                                 options:(NSDictionary *)options;
 
 - (id)initWithFrontViewController:(UIViewController *)frontViewController
-               leftViewController:(UIViewController *)leftViewController
-              rightViewController:(UIViewController *)rightViewController
+               leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
+              rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                           options:(NSDictionary *)options;
 
 - (id)initWithFrontViewController:(UIViewController *)frontViewController
-               leftViewController:(UIViewController *)leftViewController
+               leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
                           options:(NSDictionary *)options;
 
 - (id)initWithFrontViewController:(UIViewController *)frontViewController
-              rightViewController:(UIViewController *)rightViewController
+              rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                           options:(NSDictionary *)options;
 
 /**
@@ -225,14 +226,14 @@ typedef void(^PKDefaultErrorHandler)(NSError *error);
  *
  * @param UIViewController leftViewController - Thew new left view controller.
  */
-- (void)setLeftViewController:(UIViewController *)leftViewController;
+- (void)setLeftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController;
 
 /**
  * Exchanges the current right view controller for a new one.
  *
  * @param UIViewController rightViewController - Thew new right view controller.
  */
-- (void)setRightViewController:(UIViewController *)rightViewController;
+- (void)setRightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController;
 
 /**
  * Adjusts the minimum and maximum reveal width of any given view controller's view.
@@ -250,6 +251,12 @@ typedef void(^PKDefaultErrorHandler)(NSError *error);
  * @return UIViewController - Returns the currently focused controller, i.e. the one that's most prominent at any given point in time. 
  */
 - (UIViewController *)focusedController;
+
+/**
+ * @return UIViewController<PKRevealMenuDelegate> * - Returns the menu view controller. If reveal controller has both a left and right side, the left side will be returned.
+ */
+
+- (UIViewController<PKRevealMenuDelegate> *)menuViewController;
 
 /**
  * @return PKRevealControllerType - Returns the controller type, i.e. whether it has a left side, a right side, both or none.

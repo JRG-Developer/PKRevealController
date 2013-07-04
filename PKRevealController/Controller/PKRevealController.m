@@ -31,8 +31,8 @@
 @property (nonatomic, assign, readwrite) BOOL isPresentationModeActive;
 
 @property (nonatomic, strong, readwrite) UIViewController *frontViewController;
-@property (nonatomic, strong, readwrite) UIViewController *leftViewController;
-@property (nonatomic, strong, readwrite) UIViewController *rightViewController;
+@property (nonatomic, strong, readwrite) UIViewController<PKRevealMenuDelegate> *leftViewController;
+@property (nonatomic, strong, readwrite) UIViewController<PKRevealMenuDelegate> *rightViewController;
 
 @property (nonatomic, strong, readwrite) PKRevealControllerContainerView *frontViewContainer;
 @property (nonatomic, strong, readwrite) PKRevealControllerContainerView *leftViewContainer;
@@ -64,8 +64,8 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 #pragma mark - Initialization
 
 + (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
-                                    rightViewController:(UIViewController *)rightViewController
+                                     leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
+                                    rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                                                 options:(NSDictionary *)options
 {
     return [[[self class] alloc] initWithFrontViewController:frontViewController
@@ -75,7 +75,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 }
 
 + (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
+                                     leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
                                                 options:(NSDictionary *)options
 {
     return [[[self class] alloc] initWithFrontViewController:frontViewController
@@ -84,7 +84,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 }
 
 + (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                    rightViewController:(UIViewController *)rightViewController
+                                    rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                                                 options:(NSDictionary *)options
 {
     return [[[self class] alloc] initWithFrontViewController:frontViewController
@@ -93,7 +93,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 }
 
 - (id)initWithFrontViewController:(UIViewController *)frontViewController
-               leftViewController:(UIViewController *)leftViewController
+               leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
                           options:(NSDictionary *)options
 {
     return [self initWithFrontViewController:frontViewController
@@ -103,7 +103,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 }
 
 - (id)initWithFrontViewController:(UIViewController *)frontViewController
-              rightViewController:(UIViewController *)rightViewController
+              rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                           options:(NSDictionary *)options
 {
     return [self initWithFrontViewController:frontViewController
@@ -113,8 +113,8 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 }
 
 - (id)initWithFrontViewController:(UIViewController *)frontViewController
-               leftViewController:(UIViewController *)leftViewController
-              rightViewController:(UIViewController *)rightViewController
+               leftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
+              rightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
                           options:(NSDictionary *)options
 {
     self = [super init];
@@ -249,11 +249,24 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
 
 - (void)setFrontViewController:(UIViewController *)frontViewController
 {
+    UIViewController<PKRevealMenuDelegate> *menuViewController = self.menuViewController;
+    
     if (_frontViewController != frontViewController)
     {
+        if ([menuViewController respondsToSelector:@selector(revealViewController:shouldSetFrontViewController:)] &&
+            ![menuViewController revealViewController:self shouldSetFrontViewController:frontViewController])
+            return;
+        
+        if ([menuViewController respondsToSelector:@selector(revealViewController:willSelectFrontViewController:)])
+            [menuViewController revealViewController:self willSelectFrontViewController:frontViewController];
+        
         [self removeFrontViewControllerFromHierarchy];
         _frontViewController = frontViewController;
+        
         [self addFrontViewControllerToHierarchy];
+        
+        if ([menuViewController respondsToSelector:@selector(revealViewController:didSelectFrontViewController:)])
+            [menuViewController revealViewController:self didSelectFrontViewController:frontViewController];
     }
 }
 
@@ -275,7 +288,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
     }
 }
 
-- (void)setLeftViewController:(UIViewController *)leftViewController
+- (void)setLeftViewController:(UIViewController<PKRevealMenuDelegate> *)leftViewController
 {
     if (_leftViewController != leftViewController)
     {
@@ -295,7 +308,7 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
     }
 }
 
-- (void)setRightViewController:(UIViewController *)rightViewController
+- (void)setRightViewController:(UIViewController<PKRevealMenuDelegate> *)rightViewController
 {
     BOOL isRightViewVisible = (self.state == PKRevealControllerFocusesRightViewController);
     
@@ -383,6 +396,23 @@ NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"PKReveal
             break;
     }
     return returnViewController;
+}
+
+- (UIViewController<PKRevealMenuDelegate> *)menuViewController
+{
+    switch (self.type)
+    {
+        case PKRevealControllerTypeLeft:
+        case PKRevealControllerTypeBoth:
+            return self.leftViewController;
+
+        case PKRevealControllerTypeRight:
+            return self.rightViewController;
+            
+        case PKRevealControllerTypeNone:
+        default:
+            return nil;
+    }
 }
 
 - (BOOL)isPresentationModeActive
