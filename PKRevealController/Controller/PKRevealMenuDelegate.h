@@ -12,6 +12,7 @@
 @protocol PKRevealMenuDelegate <NSObject>
 @required
 - (void)selectMenuItemType:(int)type;
+- (void)changeMenuItemsEvent:(int)event;
 @optional
 - (BOOL)revealViewController:(PKRevealController *)controller shouldSetFrontViewController:(UIViewController *)viewController;
 - (void)revealViewController:(PKRevealController *)controller willSelectFrontViewController:(UIViewController *)viewController;
