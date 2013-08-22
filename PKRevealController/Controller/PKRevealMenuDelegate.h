@@ -11,6 +11,7 @@
 
 @protocol PKRevealMenuDelegate <NSObject>
 @required
+- (void)logout;
 - (void)selectMenuItemType:(int)type;
 - (void)changeMenuItemsEvent:(int)event;
 @optional
