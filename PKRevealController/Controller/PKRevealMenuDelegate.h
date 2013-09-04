@@ -14,6 +14,7 @@
 - (void)logout;
 - (void)selectMenuItemType:(int)type;
 - (void)changeMenuItemsEvent:(int)event;
+- (void)showViewControllerOnFront:(UIViewController *)viewController;
 @optional
 - (BOOL)revealViewController:(PKRevealController *)controller shouldSetFrontViewController:(UIViewController *)viewController;
 - (void)revealViewController:(PKRevealController *)controller willSelectFrontViewController:(UIViewController *)viewController;
