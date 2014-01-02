@@ -13,6 +13,7 @@
 @required
 - (void)logout;
 - (void)selectMenuItemType:(int)type;
+- (void)selectMenuItemType:(int)type options:(NSDictionary *)options;
 - (void)changeMenuItemsEvent:(int)event;
 - (void)showViewControllerOnFront:(UIViewController *)viewController;
 @optional
