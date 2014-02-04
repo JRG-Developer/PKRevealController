@@ -1,6 +1,6 @@
 //
 //  PKMenuProtocol.h
-//  AppOrderCore
+//  AOCore
 //
 //  Created by Joshua Greene on 7/4/13.
 //  Copyright (c) 2013 App-Order. All rights reserved.
